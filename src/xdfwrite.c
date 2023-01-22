@@ -78,7 +78,6 @@ int32_t main(int32_t argc, uint8_t* argv[]) {
         printf("error: write error. fdc status = %08X\n", fdc_stat);
         goto finally;
       }
-
     }
   }
 

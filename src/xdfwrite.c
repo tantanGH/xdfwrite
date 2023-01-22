@@ -84,6 +84,8 @@ int32_t main(int32_t argc, uint8_t* argv[]) {
 
   printf("Done.\n");
 
+  rc = 0;
+
 finally:
   if (fp != NULL) {
     fclose(fp);

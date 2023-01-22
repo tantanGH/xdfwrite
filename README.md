@@ -42,4 +42,4 @@ FDは事前にフォーマットしておく必要があります。
 
     head -c 1261568 hogehoge.dmg > hogehoge.xdf
 
-* 以上
+以上

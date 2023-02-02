@@ -4,6 +4,8 @@
 #include <iocslib.h>
 #include <doslib.h>
 
+#define VERSION "0.2.0"
+
 #define NUM_SIDES         (2)
 #define NUM_TRACKS        (77)
 #define SECTOR_SIZE       (1024)
@@ -14,6 +16,8 @@
 int32_t main(int32_t argc, uint8_t* argv[]) {
 
   int32_t rc = 1;
+
+  printf("XDFWRITE - XDF image file to FD writer version " VERSION " 2023 tantan\n");
 
   if (argc < 3) {
     printf("usage: XDFWRITE <xdf-image-file> <drive-number>\n");
@@ -53,7 +57,7 @@ int32_t main(int32_t argc, uint8_t* argv[]) {
     goto exit;
   }
 
-  printf("Drive %d disk will be fully overwritten. Are you really ok? (y/n)");
+  printf("Drive %d disk will be fully overwritten. Are you really ok? (y/n)", atoi(argv[2]));
   int8_t c;
   scanf("%c",&c);
   if (c != 'y' && c != 'Y') {
@@ -68,10 +72,14 @@ int32_t main(int32_t argc, uint8_t* argv[]) {
   }
 
   static uint8_t buf[ TRACK_SIZE ];
-  for (int16_t i = 0; i < NUM_SIDES; i++) {
-    for (int16_t j = 0; j < NUM_TRACKS; j++) {
+  for (int16_t j = 0; j < NUM_TRACKS; j++) {
+    for (int16_t i = 0; i < NUM_SIDES; i++) {
       printf("Writing track %d at side %d ...\n", j, i);
-      fread(buf, 1, TRACK_SIZE, fp);
+      int32_t ofs = 0;
+      do {
+        size_t len = fread(buf + ofs, 1, TRACK_SIZE - ofs, fp);
+        ofs += len;
+      } while (ofs < TRACK_SIZE);
       uint32_t rec_num = ( 3 << 24 ) + ( j << 16 ) + ( i << 8 ) + 1;
       uint32_t fdc_stat = B_WRITE(pda * 256 + 0x70, rec_num, (uint32_t)TRACK_SIZE, buf);
       if ((fdc_stat & 0xC0000000) != 0) {

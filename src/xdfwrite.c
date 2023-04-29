@@ -4,7 +4,7 @@
 #include <iocslib.h>
 #include <doslib.h>
 
-#define VERSION "0.2.0"
+#define VERSION "0.2.1 (2023/04/29)"
 
 #define NUM_SIDES         (2)
 #define NUM_TRACKS        (77)
@@ -17,7 +17,7 @@ int32_t main(int32_t argc, uint8_t* argv[]) {
 
   int32_t rc = 1;
 
-  printf("XDFWRITE - XDF image file to FD writer version " VERSION " 2023 tantan\n");
+  printf("XDFWRITE - XDF image file to FD writer version " VERSION " tantan\n");
 
   if (argc < 3) {
     printf("usage: XDFWRITE <xdf-image-file> <drive-number>\n");
@@ -38,11 +38,12 @@ int32_t main(int32_t argc, uint8_t* argv[]) {
   }
 
   if (argv[2][0] < '0' || argv[2][0] > '3') {
-    printf("error: incorrect drive number (%d). it must be 0 to 3.\n",argv[2]);
+    printf("error: incorrect drive number (%s). it must be 0 to 3.\n",argv[2]);
     goto exit;
   }
+  int16_t drive_num = argv[2][0] - '0';
 
-  int32_t pda = 0x90 + atoi(argv[2]);
+  int32_t pda = 0x90 + drive_num;
   int32_t drive_stat = B_DRVCHK(pda * 256, 0);
   if (!(drive_stat & 2)) {
     printf("error: disk is not inserted.\n");
@@ -57,7 +58,7 @@ int32_t main(int32_t argc, uint8_t* argv[]) {
     goto exit;
   }
 
-  printf("Drive %d disk will be fully overwritten. Are you really ok? (y/n)", atoi(argv[2]));
+  printf("Drive %d disk will be fully overwritten. Are you really ok? (y/n)", drive_num);
   int8_t c;
   scanf("%c",&c);
   if (c != 'y' && c != 'Y') {
